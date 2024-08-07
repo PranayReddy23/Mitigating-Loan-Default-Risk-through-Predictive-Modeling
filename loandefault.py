@@ -52,13 +52,13 @@ def main():
     # Input fields
     st.subheader("Enter Customer Information:")
     age = st.number_input("Age", min_value=0, value=35)
-    ed = st.number_input("Education Level", min_value=0, value=2)
-    employ = st.number_input("Employment Duration (years)", min_value=0, value=5)
-    address = st.number_input("Time at Current Address (years)", min_value=0, value=2)
-    income = st.number_input("Income (annual)", min_value=0.0, value=50000.0)
-    debtinc = st.number_input("Debt-to-Income Ratio (%)", min_value=0.0, value=15.0)
-    creddebt = st.number_input("Credit Card Debt", min_value=0.0, value=1000.0)
-    othdebt = st.number_input("Other Debt", min_value=0.0, value=2000.0)
+    ed = st.number_input("Education Level(High School(1), Undergraduate(3), Graduate(1), Postgraduate(2))", min_value=0, value=2)
+    employ = st.number_input("Employment Duration (Number of years the applicant has been employed.)", min_value=0, value=5)
+    address = st.number_input("Time at Current Address (Number of years the applicant has lived at their current address.)", min_value=0, value=2)
+    income = st.number_input("Income (Applicant's annual income in thousands of dollars.)", min_value=0.0, value=50000.0)
+    debtinc = st.number_input("Debt-to-Income Ratio (Ratio of the applicant's total monthly debt payments to their monthly gross income.)", min_value=0.0, value=15.0)
+    creddebt = st.number_input("Credit Card Debt(Amount of credit card debt the applicant has.)", min_value=0.0, value=1000.0)
+    othdebt = st.number_input("Other Debt(Amount of other debts the applicant has.)", min_value=0.0, value=2000.0)
     
     new_data = {
         'age': age, 'ed': ed, 'employ': employ, 'address': address,
