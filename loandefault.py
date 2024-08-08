@@ -8,6 +8,11 @@ from tensorflow.keras.models import load_model
 # Function to predict new data
 def predict_new_data(model, scaler, new_data):
     try:
+        # Check if any input is less than or equal to zero
+        for key, value in new_data.items():
+            if value <= 0:
+                raise ValueError("The input value must be greater than 0.")
+
         new_data_df = pd.DataFrame([new_data])
         new_data_df = new_data_df.rename(columns={'ed': 'education_level'})
 
@@ -35,41 +40,46 @@ def predict_new_data(model, scaler, new_data):
         predictions_binary = (predictions_probability > 0.5).astype("int32")
         return predictions_binary[0][0]
 
+    except ValueError as ve:
+        st.error(f"Input Error: {ve}")
+        return None  # Return None on error to signal to Streamlit
     except Exception as e:
         st.error(f"Error predicting new data: {e}")
         return None  # Return None on error to signal to Streamlit
 
-
 # Streamlit app
 def main():
-    st.title("Credit Default Prediction")
+    try:
+        st.title("Credit Default Prediction")
 
-    # Load pre-trained model and scaler
-    model = load_model('cnn_model.keras')  
-    with open('scaler.pkl', 'rb') as f:
-        scaler = pickle.load(f)
+        # Load pre-trained model and scaler
+        model = load_model('cnn_model.keras')  
+        with open('scaler.pkl', 'rb') as f:
+            scaler = pickle.load(f)
 
-    # Input fields
-    st.subheader("Enter Customer Information:")
-    age = st.number_input("Age", min_value=0, value=35)
-    ed = st.number_input("Education Level(High School(1), Undergraduate(3), Graduate(1), Postgraduate(2))", min_value=0, value=2)
-    employ = st.number_input("Employment Duration (Number of years the applicant has been employed.)", min_value=0, value=5)
-    address = st.number_input("Time at Current Address (Number of years the applicant has lived at their current address.)", min_value=0, value=2)
-    income = st.number_input("Income (Applicant's annual income in thousands of dollars.)", min_value=0.0, value=50000.0)
-    debtinc = st.number_input("Debt-to-Income Ratio (Ratio of the applicant's total monthly debt payments to their monthly gross income.)", min_value=0.0, value=15.0)
-    creddebt = st.number_input("Credit Card Debt(Amount of credit card debt the applicant has.)", min_value=0.0, value=1000.0)
-    othdebt = st.number_input("Other Debt(Amount of other debts the applicant has.)", min_value=0.0, value=2000.0)
-    
-    new_data = {
-        'age': age, 'ed': ed, 'employ': employ, 'address': address,
-        'income': income, 'debtinc': debtinc, 'creddebt': creddebt,
-        'othdebt': othdebt
-    }
+        # Input fields
+        age = st.number_input("Age", min_value=0)
+        ed = st.number_input("Education Level (1: High School, 2: Undergraduate, 3: Graduate, 4: Postgraduate)", min_value=0)
+        employ = st.number_input("Employment Duration (Number of years the applicant has been employed)", min_value=0)
+        address = st.number_input("Time at Current Address (Number of years the applicant has lived at their current address)", min_value=0)
+        income = st.number_input("Income (Applicant's annual income in thousands of dollars)", min_value=0.0)
+        debtinc = st.number_input("Debt-to-Income Ratio (Ratio of the applicant's total monthly debt payments to their monthly gross income)", min_value=0.0)
+        creddebt = st.number_input("Credit Card Debt (Amount of credit card debt the applicant has)", min_value=0.0)
+        othdebt = st.number_input("Other Debt (Amount of other debts the applicant has)", min_value=0.0)
+        
+        new_data = {
+            'age': age, 'ed': ed, 'employ': employ, 'address': address,
+            'income': income, 'debtinc': debtinc, 'creddebt': creddebt,
+            'othdebt': othdebt
+        }
 
-    if st.button("Predict"):
-        prediction = predict_new_data(model, scaler, new_data)
-        if prediction is not None:
-            st.success(f"Prediction: {'Default' if prediction == 1 else 'No Default'}")
+        if st.button("Predict"):
+            prediction = predict_new_data(model, scaler, new_data)
+            if prediction is not None:
+                st.success(f"Prediction: {'Default' if prediction == 1 else 'No Default'}")
+
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
 
 if __name__ == "__main__":
     main()
